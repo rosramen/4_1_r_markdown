@@ -1,0 +1,396 @@
+---
+title: "SEM04"
+author: "ROSENDO RAMIRO ENRIQUE SANCHEZ PEREZ"
+date: "20 de diciembre de 2024"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    collapsed: true
+    sooth_scroll: true
+    theme: journal
+    highlight: kate
+    d_print: paged
+    code_folding: show
+---
+
+
+![](logoUIA.png)
+
+Maestría en Inteligencia Artificial para la Transformación Digital
+
+Lenguajes de ciencia de datos avanzado (2025-01)
+
+Tercer cuatrimestre
+
+Unidad 4
+
+Alumno: Rosendo Ramiro Enrique Sánchez Pérez
+
+Tutor: Dr. Jonás Velasco Álvarez
+
+
+
+# Actividad 4. 1
+
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse) 
+``` 
+
+
+
+
+
+
+```{r message=FALSE, warning=FALSE}
+# Cargar las librerías 
+library(dplyr)
+library(lubridate)
+library(tidyr)
+```
+
+```{r message=FALSE, warning=FALSE}
+data <- read.csv("llamadas_911_2022_s1.csv", stringsAsFactors = FALSE)
+```
+Si desea ocultar el código click en Hide
+
+
+## Ejercicio 1
+
+Agrupa los incidentes por mes y alcaldía, y calcula el número promedio de incidentes por categoría.
+
+```{r message=FALSE, warning=FALSE}
+for (i in 1:3) {
+  
+  # Cargar el archivo CSV
+  # Carga el archivo correspondiente
+  if (i==1) {
+    data <- read.csv("llamadas_911_2021_s1.csv", stringsAsFactors = FALSE)
+    titulo ="Llamadas al 911 durante el primer semestre de 2021"
+  } else {if (i==2){
+    data <- read.csv("llamadas_911_2021_s2.csv", stringsAsFactors = FALSE)
+    titulo ="Llamadas al 911 durante el segundo semestre de 2021"}
+    else {
+      data <- read.csv("llamadas_911_2022_s1.csv", stringsAsFactors = FALSE)
+      titulo ="Llamadas al 911 durante el primer semestre de 2022"
+    }
+  }
+
+  
+  # Agrupar por incidente_c4, mes y alcaldía, y calcular el promedio de incidentes
+
+  resultados <- data %>% 
+  
+  #  group_by(incidente_c4, mesdecreacion, alcaldia) %>% 
+    group_by(clasif, mesnum, mesdecreacion, alcaldia) %>% 
+    summarise(promedio_incidentes = n() / n_distinct(incidente_c4), .groups = "drop")
+
+  # Mostrar los resultados
+  cat(titulo)
+  cat("\n")
+  
+  print(n=30, resultados)
+
+  # Calcular el promedio de incidentes por categoría y mostrarlo
+  promedio_por_categoria <- data %>% 
+    group_by(clasif) %>% 
+   summarise(promedio_incidentes = n() / n_distinct(clasif), .groups = "drop")
+
+  # Mostrar el promedio de incidentes por categoría
+  print(" Mostrar el promedio de incidentes por categoría")
+  print(promedio_por_categoria)
+  cat("\n\n")
+  
+}
+```
+
+Si desea ocultar el código click en Hide
+
+
+### Conclusiones del ejercicio 1
+
+
+Como se aprecia los resultados son los mismos que ya se habían analizado en la actividad 3.1 Las cifras son muy repetitivas por mes y alcaldía así como por la clasificación de incidente en lo que encabezan son servicio y delito. Solo que ahora con la ventaja que se muestran en HTML.
+
+
+
+
+
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse) 
+``` 
+```{r message=FALSE, warning=FALSE}
+# Cargar las librerías 
+library(dplyr)
+library(lubridate)
+library(tidyr)
+```
+
+
+## Ejercicio 2
+
+Identifica el día de la semana con más incidentes y determinar el total de llamadas para ese día. 
+
+```{r message=FALSE, warning=FALSE}
+for (i in 1:3) {
+  
+  # Cargar el archivo CSV
+  # Carga el archivo correspondiente
+  if (i==1) {
+    data <- read.csv("llamadas_911_2021_s1.csv", stringsAsFactors = FALSE)
+    titulo ="Llamadas al 911 durante el primer semestre de 2021"
+  } else {if (i==2){
+    data <- read.csv("llamadas_911_2021_s2.csv", stringsAsFactors = FALSE)
+    titulo ="Llamadas al 911 durante el segundo semestre de 2021"}
+    else {
+      data <- read.csv("llamadas_911_2022_s1.csv", stringsAsFactors = FALSE)
+      titulo ="Llamadas al 911 durante el primer semestre de 2022"
+    }
+  }
+    
+
+
+  # Contar el total de llamadas por día
+  dias_conteo <- data %>% 
+   group_by(dia_incidente) %>% 
+   summarise(total_llamadas = n(), .groups = "drop")
+
+  # Identificar el día con más incidentes
+  dia_max_incidentes <- dias_conteo %>% 
+   filter(total_llamadas == max(total_llamadas))
+
+  # Mostrar el resultado
+  cat(titulo)
+  cat("\n")
+  print(dia_max_incidentes)
+  cat("\n\n")
+
+}
+```
+
+### Conclusiones del ejercicio 2
+
+Como se mencionó en la actividad 3.1 el comportamiento para el día de la semana con más incidentes y el total de llamadas para ese día se manifiesta para el fin de semana en los tres semestres analizados, teniendo mayor incidencia en el sábado que es el que obtiene el mayor número de llamadas en dos de los tres semestres analizados. Ahora con R Markdown el análisis se presenta con mejor visualización con HTML
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(lubridate)
+library(tidyr)
+```
+
+## Ejercicio 3
+
+Crea un análisis temporal que muestre la distribución de incidentes por hora del día para las categorías "DELITO", "EMERGENCIA" y "URGENCIA MÉDICA". Utiliza gráficos adecuados para el análisis.
+
+```{r message=FALSE, warning=FALSE}
+# Cargar el archivo CSV
+for (i in 1:3) {
+  
+  # Cargar el archivo CSV
+  # Carga el archivo correspondiente
+  if (i==1) {
+    data <- read.csv("llamadas_911_2021_s1.csv", stringsAsFactors = FALSE)
+    titulo ="Llamadas al 911 durante el primer semestre de 2021"
+  } else {if (i==2){
+    data <- read.csv("llamadas_911_2021_s2.csv", stringsAsFactors = FALSE)
+    titulo ="Llamadas al 911 durante el segundo semestre de 2021"}
+    else {
+      data <- read.csv("llamadas_911_2022_s1.csv", stringsAsFactors = FALSE)
+      titulo ="Llamadas al 911 durante el primer semestre de 2022"
+    }
+    
+  }
+  
+
+  # Filtrar por las categorías solicitadas y convertir el campo hora_creacion a formato hora
+  llamadas_filtradas <- data %>%
+    filter(clasif %in% c("DELITO", "EMERGENCIA", "URGENCIAS MEDICAS")) %>%
+   mutate(hora = hour(hms(hora_creacion)))
+
+  # Contar los incidentes por hora y clasificación
+  incidentes_por_hora_clasif <- llamadas_filtradas %>%
+    group_by(hora, clasif) %>%
+    summarise(cantidad = n(), .groups = "drop")
+
+  # Imprimir los datos filtrados con los campos requeridos
+  cat(titulo)
+  cat("\n")
+  print(n=50,incidentes_por_hora_clasif)
+  cat("\n\n")
+
+  
+  
+  # Crear la gráfica de incidentes por hora y clasificación
+  library(ggplot2)
+  print(
+  ggplot(incidentes_por_hora_clasif, aes(x = hora, y = cantidad, color = clasif)) +
+    geom_line(size = 1) +
+    geom_point(size = 2) +
+    labs(
+      title = "Cantidad de incidentes por hora y clasificación ",
+      x = "Hora del día",
+      y = "Número de incidentes",
+      color = "Clasificación"
+     ) +
+   theme_minimal()
+  )
+ 
+  
+}
+```
+
+
+### Conclusiones ejercicio 3
+
+Observando las gráficas para cada semestre del año 2021 y el primer semestre del 2022 como ya se comentó en la actividad 3.1 la cantidad de incidentes por hora se comportan de una manera muy similar en los tres semestres analizados, ahora con una mejor visualización con R Markdown.
+
+## Ejercicio 4
+
+Calcula el tiempo promedio entre la creación y cierre del incidente (usa fecha_creacion y fecha_cierre). Así mismo, determinar el tiempo mínimo y máximo.
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(lubridate)
+library(tidyr)
+
+```
+```{r}
+for (i in 1:3) {
+  
+  # Cargar el archivo CSV
+  # Carga el archivo correspondiente
+  if (i==1) {
+    data <- read.csv("llamadas_911_2021_s1.csv", stringsAsFactors = FALSE)
+    titulo ="Llamadas al 911 durante el primer semestre de 2021"
+  } else {if (i==2){
+    data <- read.csv("llamadas_911_2021_s2.csv", stringsAsFactors = FALSE)
+    titulo ="Llamadas al 911 durante el segundo semestre de 2021"}
+    else {
+      data <- read.csv("llamadas_911_2022_s1.csv", stringsAsFactors = FALSE)
+      titulo ="Llamadas al 911 durante el primer semestre de 2022"
+    }
+    
+  }
+  
+  
+  # Verificar que las columnas necesarias existan
+  if (all(c("fecha_creacion", "hora_creacion", "fecha_cierre", "hora_cierre") %in% colnames(data))) {
+  
+    # Crear las variables combinadas de fecha y hora para inicio y cierre
+    data <- data %>%
+     mutate(
+       fecha_hora_creacion = dmy_hms(paste(fecha_creacion, hora_creacion)),
+       fecha_hora_cierre = dmy_hms(paste(fecha_cierre, hora_cierre))
+      )
+  
+    # Calcular el tiempo transcurrido en minutos
+    data <- data %>%
+      mutate(
+        tiempo_transcurrido = as.numeric(difftime(fecha_hora_cierre, fecha_hora_creacion, units = "mins"))
+      )
+    # write.csv(data, "tiempo en minutos.csv", row.names = FALSE)
+    # Mostrar las columnas para verificar que el calculo es correcto en etapa de prueba
+    resultado <- data %>%
+      select(fecha_creacion, hora_creacion, fecha_cierre, hora_cierre, tiempo_transcurrido)
+  
+  #  print(resultado)
+ 
+    tiempos <- resultado %>% 
+      summarise(
+        tiempo_promedio = mean(tiempo_transcurrido, na.rm = TRUE),
+        tiempo_minimo = min(tiempo_transcurrido, na.rm = TRUE),
+        tiempo_maximo = max(tiempo_transcurrido, na.rm = TRUE)
+      )
+    cat(titulo)
+    cat("\n")
+    print("Diferencia en minutos")
+    print(tiempos)
+  
+    # Convertir los tiempos de minutos a horas
+    tiempos <- tiempos %>% 
+      mutate(
+        tiempo_promedio = (tiempo_promedio/60),
+        tiempo_minimo = (tiempo_minimo/60),
+        tiempo_maximo = (tiempo_maximo/60)
+      )
+  
+    # Imprimir los resultados
+    cat("\n")
+    print("Diferencia en horas")
+  
+    print(tiempos)
+    
+    cat("\n\n\n")
+   ########################
+  
+  
+  } else {
+    print("Las columnas necesarias no están presentes en el archivo.")
+  }
+}
+
+```
+
+
+### Conclusiones ejercicio 4
+
+El análisis de los tiempos de respuesta promedio, máximo y mínimo en horas prácticamente son muy similares en los tres semestres analizados y en el segundo semestre de 2021 y primero de 2022 prácticamente son iguales.
+En las llamadas al 911 durante el primer semestre de 2022 el tiempo máximo de 1086041 minutos me llamó la atención, creí que era un error pero al verificar los datos parece razonable ya que se trata de un reporte de Persona desaparecida de la denuncia con folio C5/200318/05317 de fecha de creación el 18/03/2020 y fecha de cierre el 11/04/2022  dando el total de minutos desde la creación al cierre de : 1,086,041.183 minutos lo que equivale a 18,100.68 horas, 754.19 días, 25.13 meses y el equivalente 2 años 1 mes 15 días.Y mostrados con R Marktown se visualizan mejor. 
+
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(lubridate)
+library(tidyr)
+
+```
+
+## Ejercicio 5
+
+Determinar el porcentaje de llamadas que fueron clasificadas como "Falsa Alarma".
+
+```{r}
+for (i in 1:3) {
+  
+  # Cargar el archivo CSV
+    # Carga el archivo correspondiente
+  if (i==1) {
+    data <- read.csv("llamadas_911_2021_s1.csv", stringsAsFactors = FALSE)
+    titulo ="Llamadas al 911 durante el primer semestre de 2021"
+  } else {if (i==2){
+            data <- read.csv("llamadas_911_2021_s2.csv", stringsAsFactors = FALSE)
+            titulo ="Llamadas al 911 durante el segundo semestre de 2021"}
+          else {
+              data <- read.csv("llamadas_911_2022_s1.csv", stringsAsFactors = FALSE)
+              titulo ="Llamadas al 911 durante el primer semestre de 2022"
+          }
+            
+          }
+
+  # Calcular el porcentaje de llamadas clasificadas como "Falsa Alarma"
+  porcentaje_falsa_alarma <- data %>% 
+    summarise(
+      total_llamadas = n(),
+      falsas_alarmas = sum(clasif == "FALSA ALARMA", na.rm = TRUE),
+      porcentaje = (falsas_alarmas / total_llamadas) * 100
+   )
+
+  # Imprimir el porcentaje de "Falsa Alarma"
+  cat(titulo)
+  cat("\n")
+  print(porcentaje_falsa_alarma)
+  cat("\n\n")
+}
+```
+
+
+
+### Conclusiones ejercicio 5
+
+Curiosamente las cifras continúan siendo parecidas en el segundo semestre de 2021 y el primero de 2022 aunque el total de llamadas descendió significativamente en 2022. Ahora visualizadas con HTML.
+
+
